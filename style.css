@@ -1,0 +1,35 @@
+.chart {
+  display: inline-block;
+  max-width: 500px;
+}
+.data {
+  transition: opacity 500ms;
+  transition: stroke-width 500ms;
+}
+path.data {
+  fill: none;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+path.data.shade {
+  opacity: 0.1;
+  stroke-width: 1px;
+  transition: opacity 500ms;
+}
+path.data.highlight {
+  opacity: 1.0;
+  stroke-width: 6px;
+}
+rect.data {
+  stroke: black;
+  stroke-width: 1px;
+  stroke-linejoin: round;
+}
+rect.data.shade {
+  opacity: 0.1;
+  transition: opacity 500ms;
+}
+rect.data.highlight {
+  stroke-width: 4px;
+}
+
