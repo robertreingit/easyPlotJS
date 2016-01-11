@@ -47,112 +47,114 @@ var highlighter = function(selector,keys) {
       });
 };
 
-var plotAxis = function(sel) {
-};
 
+var chartFactory = (function() {
 
-var graphFactory = (function() {
-  var svg,
-      _width = 300, 
-      _height = 200,
-      margin = 30,
-      colors = d3.scale.category10();
+  return function chart() {
+    var _svg,
+        _width = 300, 
+        _height = 200,
+        _margin = 30,
+        colors = d3.scale.category10();
 
-  function init(sel) {
-    svg = d3.select(sel)
-      .append('svg')
-      .attr({
-        width: _width,
-        height: _height
-      });
-    return this;
-  }
+    function init(sel) {
+      _svg = d3.select(sel)
+        .append('svg')
+        .attr({
+          width: _width,
+          height: _height
+        });
+      return this;
+    }
 
-  function height(val) {
-    if (val === undefined)
-      return _height;
-    _height = val;
-    return this;
-  }
+    function height(val) {
+      if (val === undefined)
+        return _height;
+      _height = val;
+      return this;
+    }
 
-  function width(val) {
-    if (val === undefined) return _width;
-    _width = val;
-    return this;
-  }
+    function width(val) {
+      if (val === undefined) return _width;
+      _width = val;
+      return this;
+    }
 
-  function linegraph(data) {
+    function linegraph(data) {
 
-    var x = d3.scale.linear()
-      .domain([0,5])
-      .range([margin,width-margin])
-    var y = d3.scale.linear()
-      .domain([0,30])
-      .range([height-margin,margin]);
-    var line = d3.svg.line()
-      .x(function(el) { return x(el.x); })
-      .y(function(el) { return y(el.y); });
-    colors.domain(data.map(function(el) { return el.key; }));
+      var x = d3.scale.linear()
+        .domain([0,5])
+        .range([_margin,_width-_margin])
+      var y = d3.scale.linear()
+        .domain([0,30])
+        .range([_height-_margin,_margin]);
+      var line = d3.svg.line()
+        .x(function(el) { return x(el.x); })
+        .y(function(el) { return y(el.y); });
+      colors.domain(data.map(function(el) { return el.key; }));
 
-    var all_paths = svg.selectAll('path.data')
-      .data(data)
-      .enter()
-      .append('path')
-      .attr({
-        d: function(d) { return line(d.values); },
-        class: function(d) { return 'data ' + d.key; },
-        stroke: function(d) { return colors(d.key); }
-      });
+      var all_paths = _svg.selectAll('path.data')
+        .data(data)
+        .enter()
+        .append('path')
+        .attr({
+          d: function(d) { 
+            return line(d.values); 
+            },
+          class: function(d) { return 'data ' + d.key; },
+          stroke: function(d) { return colors(d.key); }
+        });
 
-    return this;
-  };
+      return this;
+    };
 
-  function bargraph(sel) {
-    var barwidth = 20;
-    var svg = d3.select(sel)
-      .append('svg')
-      .attr({
-        width: width, height: height
-      });
-    var x = d3.scale.ordinal()
-      .domain(data_bar.map(function(e) { return e.key; }))
-      .rangePoints([margin,width-margin],1.0);
-    var y = d3.scale.linear()
-      .domain([0,d3.max(data_bar, function(d) {
-        return d.values;
-      })])
-      .range([height-margin,margin]);
-    svg.selectAll('rect.data')
-      .data(data_bar)
-      .enter()
-      .append('rect')
-      .attr({
-        class: function(d) { return 'data ' + d.key; },
-        x: function(d) { return x(d.key) - barwidth/2; },
-        y: function(d) { return y(d.values); },
-        width: barwidth,
-        height: function(d) { return y(0) - y(d.values); },
-        fill: function(d) { return colors(d.key); }
-      });
+    function bargraph(sel) {
+      var barwidth = 20;
 
-    return this;
-  }
+      var x = d3.scale.ordinal()
+        .domain(data_bar.map(function(e) { return e.key; }))
+        .rangePoints([_margin,_width-_margin],1.0);
+      var y = d3.scale.linear()
+        .domain([0,d3.max(data_bar, function(d) {
+          return d.values;
+        })])
+        .range([_height-_margin,_margin]);
 
-  return function () {
-    return Object.create({
-        height: height,
-        width: width,
-        init: init,
-        linegraph: linegraph,
-        bargraph: bargraph
-      });
+      _svg.selectAll('rect.data')
+        .data(data_bar)
+        .enter()
+        .append('rect')
+        .attr({
+          class: function(d) { return 'data ' + d.key; },
+          x: function(d) { return x(d.key) - barwidth/2; },
+          y: function(d) { return y(d.values); },
+          width: barwidth,
+          height: function(d) { return y(0) - y(d.values); },
+          fill: function(d) { return colors(d.key); }
+        });
+
+      return this;
+    }
+
+    return {
+      height: height,
+      width: width,
+      init: init,
+      linegraph: linegraph,
+      bargraph: bargraph
+    };
   }
 })();
 
-var lgraph = graphFactory()
-  .width(500)
+var lgraph = chartFactory()
+  .width(300)
   .init('#line')
   .linegraph(data);
+
+var bgraph = chartFactory()
+  .width(250)
+  .init('#bar')
+  .bargraph(data_bar);
 
 highlighter('.data',data.map(function(el) { return el.key; }));
 
