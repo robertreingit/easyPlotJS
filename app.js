@@ -51,6 +51,15 @@ var highlighter = function(selector,keys) {
 var chartFactory = (function() {
   "use strict";
 
+  function determine_x_extent(data) {
+    var x_min = d3.min(data.map(function(ds) { return ds.values; }),
+        function(d1) { return d3.min(d1, function(d2) { return d2.x; }); })
+    var x_max = d3.max(data.map(function(ds) { return ds.values; }),
+        function(d1) { return d3.max(d1, function(d2) { return d2.x; }); });
+    return [x_min,x_max];
+  }
+  determine_x_extent(data);
+
   return function chart() {
     var _svg,
         _width = 300, 
@@ -89,9 +98,9 @@ var chartFactory = (function() {
       return this;
     }
 
-    function setup_scales() {
+    function setup_scales(values) {
       _x = d3.scale.linear()
-        .domain([0,5])
+        .domain(determine_x_extent(data))
         .range([_margin,_width-_margin])
       _y = d3.scale.linear()
         .domain([0,30])
@@ -119,7 +128,6 @@ var chartFactory = (function() {
         })
         .call(_yAxis);
     }
-
 
     function linegraph(data) {
 
