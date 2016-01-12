@@ -49,12 +49,15 @@ var highlighter = function(selector,keys) {
 
 
 var chartFactory = (function() {
+  "use strict";
 
   return function chart() {
     var _svg,
         _width = 300, 
         _height = 200,
         _margin = 30,
+        _x = null, _xAxis = null,
+        _y = null, _yAxis = null,
         colors = d3.scale.category10();
 
     function init(sel) {
@@ -80,17 +83,52 @@ var chartFactory = (function() {
       return this;
     }
 
-    function linegraph(data) {
+    function margin(val) {
+      if (val === undefined ) return _margin;
+      _margin = val;
+      return this;
+    }
 
-      var x = d3.scale.linear()
+    function setup_scales() {
+      _x = d3.scale.linear()
         .domain([0,5])
         .range([_margin,_width-_margin])
-      var y = d3.scale.linear()
+      _y = d3.scale.linear()
         .domain([0,30])
         .range([_height-_margin,_margin]);
+    }
+
+    function setup_axes() {
+      _xAxis = d3.svg.axis()
+        .scale(_x)
+        .orient('bottom');
+      _svg.append('g')
+        .attr({
+          class: 'axis x-axis',
+          transform: 'translate(0,' + (_height - _margin) + ')'
+        })
+        .call(_xAxis);
+
+      _yAxis = d3.svg.axis()
+        .scale(_y)
+        .orient('left'); 
+      _svg.append('g')
+        .attr({
+          class: 'axis y-axis',
+          transform: 'translate(' + _margin + ',0)'
+        })
+        .call(_yAxis);
+    }
+
+
+    function linegraph(data) {
+
+      setup_scales();
+      setup_axes();
+
       var line = d3.svg.line()
-        .x(function(el) { return x(el.x); })
-        .y(function(el) { return y(el.y); });
+        .x(function(el) { return _x(el.x); })
+        .y(function(el) { return _y(el.y); });
       colors.domain(data.map(function(el) { return el.key; }));
 
       var all_paths = _svg.selectAll('path.data')

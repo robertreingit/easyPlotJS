@@ -2,6 +2,15 @@
   display: inline-block;
   max-width: 500px;
 }
+
+/* Axis styles */
+.axis line,
+.axis path {
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+}
+
 .data {
   transition: opacity 500ms;
   transition: stroke-width 500ms;
