@@ -52,13 +52,17 @@ var chartFactory = (function() {
   "use strict";
 
   function determine_x_extent(data) {
-    var x_min = d3.min(data.map(function(ds) { return ds.values; }),
+    if ( Array.isArray(data[0].values) ) {
+      var x_min = d3.min(data.map(function(ds) { return ds.values; }),
         function(d1) { return d3.min(d1, function(d2) { return d2.x; }); })
-    var x_max = d3.max(data.map(function(ds) { return ds.values; }),
+      var x_max = d3.max(data.map(function(ds) { return ds.values; }),
         function(d1) { return d3.max(d1, function(d2) { return d2.x; }); });
-    return [x_min,x_max];
+      return [x_min,x_max];
+    }
+    else {
+      return data.map(function(el) { return el.key; });
+    }
   }
-  determine_x_extent(data);
 
   return function chart() {
     var _svg,
@@ -99,9 +103,17 @@ var chartFactory = (function() {
     }
 
     function setup_scales(values) {
-      _x = d3.scale.linear()
-        .domain(determine_x_extent(data))
-        .range([_margin,_width-_margin])
+      var x_domain = determine_x_extent(values)
+      if (typeof x_domain[0] !== 'string') {
+        _x = d3.scale.linear()
+          .domain(determine_x_extent(values))
+          .range([_margin,_width-_margin])
+      } else {
+        _x = d3.scale.ordinal()
+          .domain(x_domain)
+          .rangePoints([_margin,_width-_margin],1.0);
+      }
+
       _y = d3.scale.linear()
         .domain([0,30])
         .range([_height-_margin,_margin]);
@@ -131,7 +143,7 @@ var chartFactory = (function() {
 
     function linegraph(data) {
 
-      setup_scales();
+      setup_scales(data);
       setup_axes();
 
       var line = d3.svg.line()
@@ -154,17 +166,11 @@ var chartFactory = (function() {
       return this;
     };
 
-    function bargraph(sel) {
+    function bargraph(data) {
       var barwidth = 20;
 
-      var x = d3.scale.ordinal()
-        .domain(data_bar.map(function(e) { return e.key; }))
-        .rangePoints([_margin,_width-_margin],1.0);
-      var y = d3.scale.linear()
-        .domain([0,d3.max(data_bar, function(d) {
-          return d.values;
-        })])
-        .range([_height-_margin,_margin]);
+      setup_scales(data);
+      setup_axes();
 
       _svg.selectAll('rect.data')
         .data(data_bar)
@@ -172,10 +178,10 @@ var chartFactory = (function() {
         .append('rect')
         .attr({
           class: function(d) { return 'data ' + d.key; },
-          x: function(d) { return x(d.key) - barwidth/2; },
-          y: function(d) { return y(d.values); },
+          x: function(d) { return _x(d.key) - barwidth/2; },
+          y: function(d) { return _y(d.values); },
           width: barwidth,
-          height: function(d) { return y(0) - y(d.values); },
+          height: function(d) { return _y(0) - _y(d.values); },
           fill: function(d) { return colors(d.key); }
         });
 
