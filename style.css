@@ -35,7 +35,7 @@ path.data.highlight {
 }
 rect.data {
   stroke: black;
-  stroke-width: 1px;
+  stroke-width: 0;
   stroke-linejoin: round;
 }
 rect.data.shade {
@@ -43,6 +43,6 @@ rect.data.shade {
   transition: opacity 500ms;
 }
 rect.data.highlight {
-  stroke-width: 4px;
+  stroke-width: 2px;
 }
 

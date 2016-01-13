@@ -60,12 +60,14 @@ var chartFactory = (function() {
    * Linegraph mixin
    */
   function linegraph(proto) {
+    var proto = Object.getPrototypeOf(this),
+        that = this;
 
-    var that = this;
     var x_min = d3.min(data.map(function(ds) { return ds.values; }),
         function(d1) { return d3.min(d1, function(d2) { return d2.x; }); })
     var x_max = d3.max(data.map(function(ds) { return ds.values; }),
         function(d1) { return d3.max(d1, function(d2) { return d2.x; }); });
+
     proto._x = d3.scale.linear()
       .domain([x_min,x_max])
       .range([this.margin(),this.width()-this.margin()])
@@ -94,6 +96,43 @@ var chartFactory = (function() {
 
     return this;
   };
+
+  function bargraph(data) {
+    var proto = Object.getPrototypeOf(this),
+        that = this;
+
+    var _barwidth = 20;
+    proto.barwidth = function(value) {
+      if (val === undefined) return _barwidth;
+      _barwidth = value;
+      return that;
+    }
+
+    proto._x = d3.scale.ordinal()
+          .domain(this.data.map(function(d) { return d.key; }))
+          .rangePoints([this.margin(),this.width()-this.margin()],1.0);
+    proto._y = d3.scale.linear()
+        .domain([0,d3.max(this.data, function(d) {
+          return d.values;
+        })])
+        .range([this.height()-this.margin(),this.margin()]);
+    this.setup_axes();
+
+    this._svg.selectAll('rect.data')
+      .data(this.data)
+      .enter()
+      .append('rect')
+      .attr({
+        class: function(d) { return 'data ' + d.key; },
+        x: function(d) { return that._x(d.key) - _barwidth/2; },
+        y: function(d) { return that._y(d.values); },
+        width: _barwidth,
+        height: function(d) { return that._y(0) - that._y(d.values); },
+        fill: function(d) { return that.colors()(d.key); }
+      });
+
+    return this;
+  }
 
   return function chart() {
     var _svg,
@@ -146,21 +185,6 @@ var chartFactory = (function() {
       return this;
     }
 
-    o.setup_scales = function(values) {
-      var x_domain = determine_x_extent(values)
-      if (typeof x_domain[0] !== 'string') {
-
-      } else {
-        _x = d3.scale.ordinal()
-          .domain(x_domain)
-          .rangePoints([_margin,_width-_margin],1.0);
-      }
-
-      _y = d3.scale.linear()
-        .domain([0,30])
-        .range([_height-_margin,_margin]);
-    }
-
     o.setup_axes = function() {
       _xAxis = d3.svg.axis()
         .scale(this._x)
@@ -183,31 +207,15 @@ var chartFactory = (function() {
         .call(_yAxis);
     }
 
-    function bargraph(data) {
-      var barwidth = 20;
-
-      setup_scales(data);
-      setup_axes();
-
-      _svg.selectAll('rect.data')
-        .data(data_bar)
-        .enter()
-        .append('rect')
-        .attr({
-          class: function(d) { return 'data ' + d.key; },
-          x: function(d) { return _x(d.key) - barwidth/2; },
-          y: function(d) { return _y(d.values); },
-          width: barwidth,
-          height: function(d) { return _y(0) - _y(d.values); },
-          fill: function(d) { return colors(d.key); }
-        });
-
-      return this;
-    }
-
     o.plot = function(data) {
+
       this.data = data;
-      linegraph.call(this,Object.getPrototypeOf(this));
+      if (Array.isArray(data[0].values)) {
+        linegraph.call(this);
+      }
+      else {
+        bargraph.call(this);
+      }
     }
 
     return o;
@@ -220,8 +228,9 @@ var lgraph = chartFactory()
   .plot(data);
 
 var bgraph = chartFactory()
-  .width(250)
+  .width(350)
   .init('#bar')
+  .plot(data_bar);
 
 highlighter('.data',data.map(function(el) { return el.key; }));
 
