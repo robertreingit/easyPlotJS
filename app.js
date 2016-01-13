@@ -61,6 +61,7 @@ var chartFactory = (function() {
    */
   function linegraph(proto) {
 
+    var that = this;
     var x_min = d3.min(data.map(function(ds) { return ds.values; }),
         function(d1) { return d3.min(d1, function(d2) { return d2.x; }); })
     var x_max = d3.max(data.map(function(ds) { return ds.values; }),
@@ -68,24 +69,27 @@ var chartFactory = (function() {
     proto._x = d3.scale.linear()
       .domain([x_min,x_max])
       .range([this.margin(),this.width()-this.margin()])
+    proto._y = d3.scale.linear()
+        .domain([0,30])
+        .range([this.height()-this.margin(),this.margin()]);
 
     this.setup_axes();
 
     proto.line = d3.svg.line()
       .x(function(el) { return this._x(el.x); })
       .y(function(el) { return this._y(el.y); });
-    this.colors.domain(this.data.map(function(el) { return el.key; }));
+    this.colors().domain(this.data.map(function(el) { return el.key; }));
 
-    proto.all_paths = _svg.selectAll('path.data')
+    proto.all_paths = this._svg.selectAll('path.data')
       .data(data)
       .enter()
       .append('path')
       .attr({
         d: function(d) { 
-          return line(d.values); 
+          return proto.line(d.values); 
           },
         class: function(d) { return 'data ' + d.key; },
-        stroke: function(d) { return colors(d.key); }
+        stroke: function(d) { return that.colors()(d.key); }
       });
 
     return this;
@@ -98,7 +102,7 @@ var chartFactory = (function() {
         _margin = 30,
         _xAxis = null,
         _yAxis = null,
-        colors = d3.scale.category10();
+        _colors = d3.scale.category10();
 
     var o = Object.create({});
 
@@ -109,6 +113,11 @@ var chartFactory = (function() {
           width: _width,
           height: _height
         });
+
+      /* hack */
+      this._svg = _svg;
+      /* end hack */
+
       return this;
     }
 
@@ -164,7 +173,7 @@ var chartFactory = (function() {
         .call(_xAxis);
 
       _yAxis = d3.svg.axis()
-        .scale(_y)
+        .scale(this._y)
         .orient('left'); 
       _svg.append('g')
         .attr({
