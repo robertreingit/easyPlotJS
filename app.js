@@ -52,28 +52,57 @@ var chartFactory = (function() {
   "use strict";
 
   function determine_x_extent(data) {
-    if ( Array.isArray(data[0].values) ) {
-      var x_min = d3.min(data.map(function(ds) { return ds.values; }),
-        function(d1) { return d3.min(d1, function(d2) { return d2.x; }); })
-      var x_max = d3.max(data.map(function(ds) { return ds.values; }),
-        function(d1) { return d3.max(d1, function(d2) { return d2.x; }); });
-      return [x_min,x_max];
-    }
-    else {
-      return data.map(function(el) { return el.key; });
-    }
+    return data.map(function(el) { return el.key; });
   }
+
+
+  /**
+   * Linegraph mixin
+   */
+  function linegraph(proto) {
+
+    var x_min = d3.min(data.map(function(ds) { return ds.values; }),
+        function(d1) { return d3.min(d1, function(d2) { return d2.x; }); })
+    var x_max = d3.max(data.map(function(ds) { return ds.values; }),
+        function(d1) { return d3.max(d1, function(d2) { return d2.x; }); });
+    proto._x = d3.scale.linear()
+      .domain([x_min,x_max])
+      .range([this.margin(),this.width()-this.margin()])
+
+    this.setup_axes();
+
+    proto.line = d3.svg.line()
+      .x(function(el) { return this._x(el.x); })
+      .y(function(el) { return this._y(el.y); });
+    this.colors.domain(this.data.map(function(el) { return el.key; }));
+
+    proto.all_paths = _svg.selectAll('path.data')
+      .data(data)
+      .enter()
+      .append('path')
+      .attr({
+        d: function(d) { 
+          return line(d.values); 
+          },
+        class: function(d) { return 'data ' + d.key; },
+        stroke: function(d) { return colors(d.key); }
+      });
+
+    return this;
+  };
 
   return function chart() {
     var _svg,
         _width = 300, 
         _height = 200,
         _margin = 30,
-        _x = null, _xAxis = null,
-        _y = null, _yAxis = null,
+        _xAxis = null,
+        _yAxis = null,
         colors = d3.scale.category10();
 
-    function init(sel) {
+    var o = Object.create({});
+
+    o.init = function (sel) {
       _svg = d3.select(sel)
         .append('svg')
         .attr({
@@ -83,31 +112,35 @@ var chartFactory = (function() {
       return this;
     }
 
-    function height(val) {
+    o.height = function(val) {
       if (val === undefined)
         return _height;
       _height = val;
       return this;
     }
 
-    function width(val) {
+    o.width = function(val) {
       if (val === undefined) return _width;
       _width = val;
       return this;
     }
 
-    function margin(val) {
+    o.margin = function(val) {
       if (val === undefined ) return _margin;
       _margin = val;
       return this;
     }
 
-    function setup_scales(values) {
+    o.colors = function(val) {
+      if (val === undefined) return _colors;
+      _colors = val;
+      return this;
+    }
+
+    o.setup_scales = function(values) {
       var x_domain = determine_x_extent(values)
       if (typeof x_domain[0] !== 'string') {
-        _x = d3.scale.linear()
-          .domain(determine_x_extent(values))
-          .range([_margin,_width-_margin])
+
       } else {
         _x = d3.scale.ordinal()
           .domain(x_domain)
@@ -119,14 +152,14 @@ var chartFactory = (function() {
         .range([_height-_margin,_margin]);
     }
 
-    function setup_axes() {
+    o.setup_axes = function() {
       _xAxis = d3.svg.axis()
-        .scale(_x)
+        .scale(this._x)
         .orient('bottom');
       _svg.append('g')
         .attr({
           class: 'axis x-axis',
-          transform: 'translate(0,' + (_height - _margin) + ')'
+          transform: 'translate(0,' + (this.height() - this.margin()) + ')'
         })
         .call(_xAxis);
 
@@ -140,31 +173,6 @@ var chartFactory = (function() {
         })
         .call(_yAxis);
     }
-
-    function linegraph(data) {
-
-      setup_scales(data);
-      setup_axes();
-
-      var line = d3.svg.line()
-        .x(function(el) { return _x(el.x); })
-        .y(function(el) { return _y(el.y); });
-      colors.domain(data.map(function(el) { return el.key; }));
-
-      var all_paths = _svg.selectAll('path.data')
-        .data(data)
-        .enter()
-        .append('path')
-        .attr({
-          d: function(d) { 
-            return line(d.values); 
-            },
-          class: function(d) { return 'data ' + d.key; },
-          stroke: function(d) { return colors(d.key); }
-        });
-
-      return this;
-    };
 
     function bargraph(data) {
       var barwidth = 20;
@@ -188,25 +196,23 @@ var chartFactory = (function() {
       return this;
     }
 
-    return {
-      height: height,
-      width: width,
-      init: init,
-      linegraph: linegraph,
-      bargraph: bargraph
-    };
+    o.plot = function(data) {
+      this.data = data;
+      linegraph.call(this,Object.getPrototypeOf(this));
+    }
+
+    return o;
   }
 })();
 
 var lgraph = chartFactory()
   .width(300)
   .init('#line')
-  .linegraph(data);
+  .plot(data);
 
 var bgraph = chartFactory()
   .width(250)
   .init('#bar')
-  .bargraph(data_bar);
 
 highlighter('.data',data.map(function(el) { return el.key; }));
 
