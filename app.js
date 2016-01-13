@@ -51,15 +51,12 @@ var highlighter = function(selector,keys) {
 var chartFactory = (function() {
   "use strict";
 
-  function determine_x_extent(data) {
-    return data.map(function(el) { return el.key; });
-  }
-
-
   /**
    * Linegraph mixin
+   * @return {object} the chart object with the linegraph properties and
+   *    methods added to the objects' prototype.
    */
-  function linegraph(proto) {
+  function linegraph() {
     var proto = Object.getPrototypeOf(this),
         that = this;
 
@@ -78,8 +75,8 @@ var chartFactory = (function() {
     this.setup_axes();
 
     proto.line = d3.svg.line()
-      .x(function(el) { return this._x(el.x); })
-      .y(function(el) { return this._y(el.y); });
+      .x(function(el) { return that._x(el.x); })
+      .y(function(el) { return that._y(el.y); });
     this.colors().domain(this.data.map(function(el) { return el.key; }));
 
     proto.all_paths = this._svg.selectAll('path.data')
@@ -97,7 +94,11 @@ var chartFactory = (function() {
     return this;
   };
 
-  function bargraph(data) {
+  /**
+   * bargraph mixin
+   * 
+   */
+  function bargraph() {
     var proto = Object.getPrototypeOf(this),
         that = this;
 
@@ -207,14 +208,25 @@ var chartFactory = (function() {
         .call(_yAxis);
     }
 
-    o.plot = function(data) {
+    o.xAxis = function(value) {
+      if (value === undefined) return _xAxis;
+      _xAxis = value;
+      return this;
+    }
 
+    o.yAxis = function(value) {
+      if (value === undefined) return _yAxis;
+      _yAxis = value;
+      return this;
+    }
+
+    o.plot = function(data) {
       this.data = data;
       if (Array.isArray(data[0].values)) {
-        linegraph.call(this);
+        return linegraph.call(this);
       }
       else {
-        bargraph.call(this);
+        return bargraph.call(this);
       }
     }
 
