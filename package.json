@@ -1,0 +1,28 @@
+{
+  "name": "easyplotjs",
+  "version": "0.0.1",
+  "description": "Simple charting library",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robertreingit/EasyPlotJS.git"
+  },
+  "keywords": [
+    "D3js",
+    "Charts",
+    "Graph"
+  ],
+  "author": "Robert Rein",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/robertreingit/EasyPlotJS/issues"
+  },
+  "homepage": "https://github.com/robertreingit/EasyPlotJS#readme",
+  "devDependencies": {
+    "d3": "^3.5.12",
+    "es5-shim": "^4.4.1"
+  }
+}
