@@ -213,7 +213,7 @@ var chartFactory = (function() {
       if (value === undefined) return _xAxis;
       _xAxis = value;
       return this;
-    }
+    };
 
     o.xTicks = function(value) {
       if (value === undefined) return _xAxis.ticks();
@@ -226,13 +226,26 @@ var chartFactory = (function() {
         _xAxis.ticks(value);
       }
       this._svg.select('.x-axis').call(_xAxis);
-    }
+      return this;
+    };
 
     o.yAxis = function(value) {
       if (value === undefined) return _yAxis;
       _yAxis = value;
       return this;
     }
+
+    o.yTicks = function(value) {
+      if (value === undefined) return _yAxis.ticks();
+      if (Array.isArray(value)) {
+        _yAxis.tickValues(value);
+      }
+      else {
+        _yAxis.ticks(value);
+      }
+      this._svg.select('.y-axis').call(_yAxis);
+      return this;
+    };
 
     o.plot = function(data) {
       this.data = data;
@@ -257,7 +270,8 @@ var lgraph = chartFactory()
 var bgraph = chartFactory()
   .width(350)
   .init('#bar')
-  .plot(data_bar);
+  .plot(data_bar)
+  .yTicks(5);
 
 highlighter('.data',data.map(function(el) { return el.key; }));
 
