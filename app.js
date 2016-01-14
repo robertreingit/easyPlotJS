@@ -136,27 +136,28 @@ var chartFactory = (function() {
   }
 
   return function chart() {
-    var _svg,
-        _width = 300, 
+    var _width = 300, 
         _height = 200,
         _margin = 30,
         _xAxis = null,
         _yAxis = null,
         _colors = d3.scale.category10();
 
-    var o = Object.create({});
+    var o = Object.create({}, {
+      _svg: {
+        writable: true,
+        configurable: true,
+        value: null
+      }
+    });
 
     o.init = function (sel) {
-      _svg = d3.select(sel)
+      this._svg = d3.select(sel)
         .append('svg')
         .attr({
           width: _width,
           height: _height
         });
-
-      /* hack */
-      this._svg = _svg;
-      /* end hack */
 
       return this;
     }
@@ -190,7 +191,7 @@ var chartFactory = (function() {
       _xAxis = d3.svg.axis()
         .scale(this._x)
         .orient('bottom');
-      _svg.append('g')
+      this._svg.append('g')
         .attr({
           class: 'axis x-axis',
           transform: 'translate(0,' + (this.height() - this.margin()) + ')'
@@ -200,7 +201,7 @@ var chartFactory = (function() {
       _yAxis = d3.svg.axis()
         .scale(this._y)
         .orient('left'); 
-      _svg.append('g')
+      this._svg.append('g')
         .attr({
           class: 'axis y-axis',
           transform: 'translate(' + _margin + ',0)'
@@ -212,6 +213,19 @@ var chartFactory = (function() {
       if (value === undefined) return _xAxis;
       _xAxis = value;
       return this;
+    }
+
+    o.xTicks = function(value) {
+      if (value === undefined) return _xAxis.ticks();
+      if (Array.isArray(value)) {
+        /* Specifying tick values. */
+        _xAxis.tickValues(value);
+      }
+      else {
+        /* Specifying number of ticks. */
+        _xAxis.ticks(value);
+      }
+      this._svg.select('.x-axis').call(_xAxis);
     }
 
     o.yAxis = function(value) {
@@ -236,6 +250,7 @@ var chartFactory = (function() {
 
 var lgraph = chartFactory()
   .width(300)
+  .height(400)
   .init('#line')
   .plot(data);
 
