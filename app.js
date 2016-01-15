@@ -187,16 +187,10 @@ var chartFactory = (function() {
         _yAxis = null,
         _colors = d3.scale.category10();
 
-    var o = Object.create({}, {
-      _svg: {
-        writable: true,
-        configurable: true,
-        value: null
-      }
-    });
+    var o = {};
 
     o.init = function (sel) {
-      this._svg = d3.select(sel)
+      o._svg = d3.select(sel)
         .append('svg')
         .attr({
           width: _width,
@@ -300,7 +294,7 @@ var chartFactory = (function() {
         return bargraph.call(this);
       }
     }
-    return o;
+    return Object.create(o);
   }
 })();
 
