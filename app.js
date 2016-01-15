@@ -16,6 +16,24 @@ var data = d3.nest()
     {x: 4, y: 28, lab: 'c' }
   ]);
 
+var data2 = d3.nest()
+  .key(function(el) {return el.lab;})
+  .entries([
+    {x: 1, y: 15, lab: 'e' },
+    {x: 2, y: 23, lab: 'e' },
+    {x: 3, y: 5, lab: 'e' },
+    {x: 4, y: 1, lab: 'e' },
+    {x: 5, y: 10, lab: 'e' },
+    {x: 1, y: 12, lab: 'f' },
+    {x: 2, y: 13, lab: 'f' },
+    {x: 3, y: 17, lab: 'f' },
+    {x: 4, y: 17, lab: 'f' },
+    {x: 1, y: 13, lab: 'g' },
+    {x: 2, y: 12, lab: 'g' },
+    {x: 3, y: 19, lab: 'g' },
+    {x: 4, y: 21, lab: 'g' }
+  ]);
+
 var data_bar = data.map(function(el) {
   return { 
     key: el.key, 
@@ -57,20 +75,43 @@ var chartFactory = (function() {
    *    methods added to the objects' prototype.
    */
   function linegraph() {
+
     var proto = Object.getPrototypeOf(this),
         that = this;
 
-    var x_min = d3.min(data.map(function(ds) { return ds.values; }),
-        function(d1) { return d3.min(d1, function(d2) { return d2.x; }); })
-    var x_max = d3.max(data.map(function(ds) { return ds.values; }),
-        function(d1) { return d3.max(d1, function(d2) { return d2.x; }); });
+    /*
+     * get_lim function
+     * @returns {number} the limit as specified by the lim_fcn
+     */
+    var get_lim = function(data,lim_fcn,acc_fcn) {
+      return lim_fcn(data.map(function(ds) { return ds.values; }),
+        function(d1) { return lim_fcn(d1, function(d2) {
+          return acc_fcn(d2); }) });
+    };
 
-    proto._x = d3.scale.linear()
-      .domain([x_min,x_max])
-      .range([this.margin(),this.width()-this.margin()])
-    proto._y = d3.scale.linear()
-        .domain([0,30])
-        .range([this.height()-this.margin(),this.margin()]);
+    var x_min = get_lim(data, d3.min, function(d) { return d.x; });
+    var x_max = get_lim(data, d3.max, function(d) { return d.x; });
+
+    if (proto._x) {
+      proto._x.domain([x_min,x_max]);
+    }
+    else {
+      proto._x = d3.scale.linear()
+        .domain([x_min,x_max])
+        .range([this.margin(),this.width()-this.margin()])
+    }
+
+    var y_min = get_lim(data, d3.min, function(d) { return d.y; });
+    var y_max = get_lim(data, d3.max, function(d) { return d.y; });
+
+    if (proto._y) {
+      proto._y.domain([y_min,y_max]);
+    }
+    else {
+      proto._y = d3.scale.linear()
+          .domain([y_min,y_max])
+          .range([this.height()-this.margin(),this.margin()]);
+    }
 
     this.setup_axes();
 
@@ -135,6 +176,9 @@ var chartFactory = (function() {
     return this;
   }
 
+  /**
+   * Main chart function.
+   */
   return function chart() {
     var _width = 300, 
         _height = 200,
@@ -256,7 +300,6 @@ var chartFactory = (function() {
         return bargraph.call(this);
       }
     }
-
     return o;
   }
 })();
@@ -265,7 +308,8 @@ var lgraph = chartFactory()
   .width(300)
   .height(400)
   .init('#line')
-  .plot(data);
+  .plot(data)
+  .xTicks(4);
 
 var bgraph = chartFactory()
   .width(350)
