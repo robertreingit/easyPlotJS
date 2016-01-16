@@ -1,5 +1,7 @@
 "use strict";
 
+var data0 = [10,30,20,40];
+
 var data = d3.nest()
   .key(function(el) {return el.lab;})
   .entries([
@@ -89,8 +91,8 @@ var chartFactory = (function() {
           return acc_fcn(d2); }) });
     };
 
-    var x_min = get_lim(data, d3.min, function(d) { return d.x; });
-    var x_max = get_lim(data, d3.max, function(d) { return d.x; });
+    var x_min = get_lim(this.data, d3.min, function(d) { return d.x; });
+    var x_max = get_lim(this.data, d3.max, function(d) { return d.x; });
 
     if (proto._x) {
       proto._x.domain([x_min,x_max]);
@@ -101,8 +103,8 @@ var chartFactory = (function() {
         .range([this.margin(),this.width()-this.margin()])
     }
 
-    var y_min = get_lim(data, d3.min, function(d) { return d.y; });
-    var y_max = get_lim(data, d3.max, function(d) { return d.y; });
+    var y_min = get_lim(this.data, d3.min, function(d) { return d.y; });
+    var y_max = get_lim(this.data, d3.max, function(d) { return d.y; });
 
     if (proto._y) {
       proto._y.domain([y_min,y_max]);
@@ -121,7 +123,7 @@ var chartFactory = (function() {
     this.colors().domain(this.data.map(function(el) { return el.key; }));
 
     proto.all_paths = this._svg.selectAll('path.data')
-      .data(data)
+      .data(this.data)
       .enter()
       .append('path')
       .attr({
@@ -287,16 +289,37 @@ var chartFactory = (function() {
 
     o.plot = function(data) {
       this.data = data;
-      if (Array.isArray(data[0].values)) {
-        return linegraph.call(this);
+      if (data[0].key) { // nested structure
+        if (Array.isArray(data[0].values)) {
+          return linegraph.call(this);
+        }
+        else {
+          return bargraph.call(this);
+        }
       }
-      else {
-        return bargraph.call(this);
+      else { // flat structure
+        if (data[0].x) {
+        }
+        else { // no accessor function
+          var values = data.map(function(d,i) {
+            return {x:i, y:d} 
+          });
+          console.log(values);
+          this.data = [{
+            'key': 'dummy',
+            'values': values
+          }];
+          return linegraph.call(this);
+        }
       }
     }
     return Object.create(o);
   }
 })();
+
+var sgraph = chartFactory()
+  .init('#basic')
+  .plot(data0);
 
 var lgraph = chartFactory()
   .width(300)
