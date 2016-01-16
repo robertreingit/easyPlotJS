@@ -334,5 +334,6 @@ var bgraph = chartFactory()
   .plot(data_bar)
   .yTicks(5);
 
-highlighter('.data',data.map(function(el) { return el.key; }));
+highlighter('.board .data',data.map(function(el) { return el.key; }));
+
 
