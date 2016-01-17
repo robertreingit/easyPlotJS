@@ -1,6 +1,7 @@
 "use strict";
 
 var data0 = [10,30,20,40];
+var data01 = [15,25,9,43,44];
 
 var data = d3.nest()
   .key(function(el) {return el.lab;})
@@ -304,7 +305,6 @@ var chartFactory = (function() {
           var values = data.map(function(d,i) {
             return {x:i, y:d} 
           });
-          console.log(values);
           this.data = [{
             'key': 'dummy',
             'values': values
@@ -320,6 +320,10 @@ var chartFactory = (function() {
 var sgraph = chartFactory()
   .init('#basic')
   .plot(data0);
+
+setTimeout(function() {
+  sgraph.plot(data01);
+}, 1000);
 
 var lgraph = chartFactory()
   .width(300)
