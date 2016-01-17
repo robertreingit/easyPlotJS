@@ -96,6 +96,7 @@ var chartFactory = (function() {
     var x_max = get_lim(this.data, d3.max, function(d) { return d.x; });
 
     if (proto._x) {
+      console.log('update _x');
       proto._x.domain([x_min,x_max]);
     }
     else {
@@ -186,8 +187,8 @@ var chartFactory = (function() {
     var _width = 300, 
         _height = 200,
         _margin = 30,
-        _xAxis = null,
-        _yAxis = null,
+        _xAxis = d3.svg.axis().orient('bototm'),
+        _yAxis = _yAxis = d3.svg.axis().orient('left'),
         _colors = d3.scale.category10();
 
     var o = {};
@@ -199,6 +200,18 @@ var chartFactory = (function() {
           width: _width,
           height: _height
         });
+
+      this._svg.append('g')
+        .attr({
+          class: 'axis x-axis',
+          transform: 'translate(0,' + (this.height() - this.margin()) + ')'
+        });
+
+      this._svg.append('g')
+        .attr({
+          class: 'axis y-axis',
+          transform: 'translate(' + _margin + ',0)'
+        })
 
       return this;
     }
@@ -229,24 +242,15 @@ var chartFactory = (function() {
     }
 
     o.setup_axes = function() {
-      _xAxis = d3.svg.axis()
-        .scale(this._x)
-        .orient('bottom');
-      this._svg.append('g')
-        .attr({
-          class: 'axis x-axis',
-          transform: 'translate(0,' + (this.height() - this.margin()) + ')'
-        })
-        .call(_xAxis);
 
-      _yAxis = d3.svg.axis()
-        .scale(this._y)
-        .orient('left'); 
-      this._svg.append('g')
-        .attr({
-          class: 'axis y-axis',
-          transform: 'translate(' + _margin + ',0)'
-        })
+      _xAxis.scale(this._x);
+      this._svg
+        .select('.x-axis')
+        .call(_xAxis);
+      
+      _yAxis.scale(this._y);
+      this._svg
+        .select('.y-axis')
         .call(_yAxis);
     }
 
