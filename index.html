@@ -5,11 +5,18 @@
   <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body>
-  <div class="chart" id="basic"></div>
-  <div class="board">
-    <div class="chart" id="line"></div>
-    <div class="chart" id="bar"></div>
-  </div>
+  
+  <section>
+    <h2>Single graph</h2>
+    <div class="chart" id="basic"></div>
+  </section>
+  <section>
+    <h2>Connected graphs</h2>
+    <div class="board">
+      <div class="chart" id="line"></div>
+      <div class="chart" id="bar"></div>
+    </div>
+  </section>
   <script src="node_modules/es5-shim/es5-shim.min.js"></script>
   <script src="node_modules/d3/d3.min.js" charset="utf-8"></script>
   <script src="app.js"></script>

@@ -172,15 +172,30 @@ var chartFactory = (function() {
       return that;
     }
 
-    proto._x = d3.scale.ordinal()
-          .domain(this.data.map(function(d) { return d.key; }))
-          .rangePoints([this.margin(),this.width()-this.margin()],1.0);
-    proto._y = d3.scale.linear()
-        .domain([0,d3.max(this.data, function(d) {
-          return d.values;
-        })])
-        .range([this.height()-this.margin(),this.margin()]);
+    if (proto._x) {
+      proto._x.domain(this.data.map(function(d) { return d.key; }));
+    }
+    else {
+      proto._x = d3.scale.ordinal()
+            .domain(this.data.map(function(d) { return d.key; }))
+            .rangePoints([this.margin(),this.width()-this.margin()],1.0);
+    }
+
+    if (proto._y) {
+      proto._y.domain([0,d3.max(this.data, function(d) {
+        return d.values;
+      })]);
+    }
+    else {
+      proto._y = d3.scale.linear()
+          .domain([0,d3.max(this.data, function(d) {
+            return d.values;
+          })])
+          .range([this.height()-this.margin(),this.margin()]);
+    }
     this.setup_axes();
+
+    that.colors().domain(this.data.map(function(d) { return d.key; }));
 
     var bar_data = this._svg.selectAll('rect.data')
       .data(this.data);
