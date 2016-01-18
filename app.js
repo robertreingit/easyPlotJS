@@ -47,6 +47,13 @@ var data_bar = data.map(function(el) {
     };
 });
 
+var data_bar2 = data2.map(function(el) {
+  return {
+    key: el.key,
+    values: d3.sum(el.values, function(d) { return d.y; })
+  };
+});
+
 var highlighter = function(selector,keys) {
   "use strict";
   var items = d3.selectAll(selector);
@@ -124,8 +131,17 @@ var chartFactory = (function() {
       .y(function(el) { return that._y(el.y); });
     this.colors().domain(this.data.map(function(el) { return el.key; }));
 
-    proto.all_paths = this._svg.selectAll('path.data')
-      .data(this.data)
+    // Plot data
+    var data_line = proto.all_paths = this._svg.selectAll('path.data')
+      .data(this.data);
+    // update selection
+    data_line
+      .attr({
+        d: function(d) { return proto.line(d.values); },
+        class: function(d) { return 'data ' + d.key; }
+      });
+    // enter selection
+    data_line
       .enter()
       .append('path')
       .attr({
@@ -135,6 +151,8 @@ var chartFactory = (function() {
         class: function(d) { return 'data ' + d.key; },
         stroke: function(d) { return that.colors()(d.key); }
       });
+    // exit selection
+    data_line.exit().remove();
 
     return this;
   };
@@ -164,8 +182,20 @@ var chartFactory = (function() {
         .range([this.height()-this.margin(),this.margin()]);
     this.setup_axes();
 
-    this._svg.selectAll('rect.data')
-      .data(this.data)
+    var bar_data = this._svg.selectAll('rect.data')
+      .data(this.data);
+    // update selection
+    bar_data
+      .attr({
+        class: function(d) { return 'data ' + d.key; },
+        x: function(d) { return that._x(d.key) - _barwidth/2; },
+        y: function(d) { return that._y(d.values); },
+        width: _barwidth,
+        height: function(d) { return that._y(0) - that._y(d.values); },
+        fill: function(d) { return that.colors()(d.key); }
+    });
+    // enter selection
+    bar_data
       .enter()
       .append('rect')
       .attr({
@@ -176,6 +206,8 @@ var chartFactory = (function() {
         height: function(d) { return that._y(0) - that._y(d.values); },
         fill: function(d) { return that.colors()(d.key); }
       });
+    // exit selection
+    bar_data.exit().remove();
 
     return this;
   }
@@ -327,6 +359,8 @@ var sgraph = chartFactory()
 
 setTimeout(function() {
   sgraph.plot(data01);
+  lgraph.plot(data2);
+  bgraph.plot(data_bar2);
 }, 1000);
 
 var lgraph = chartFactory()
