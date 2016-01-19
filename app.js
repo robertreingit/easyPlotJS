@@ -1,58 +1,3 @@
-"use strict";
-
-var data0 = [10,30,20,40];
-var data01 = [15,25,9,43,44];
-
-var data = d3.nest()
-  .key(function(el) {return el.lab;})
-  .entries([
-    {x: 1, y: 10, lab: 'a' },
-    {x: 2, y: 20, lab: 'a' },
-    {x: 3, y: 15, lab: 'a' },
-    {x: 4, y: 21, lab: 'a' },
-    {x: 1, y: 12, lab: 'b' },
-    {x: 2, y: 13, lab: 'b' },
-    {x: 3, y: 17, lab: 'b' },
-    {x: 1, y: 1, lab: 'c' },
-    {x: 2, y: 24, lab: 'c' },
-    {x: 3, y: 9, lab: 'c' },
-    {x: 4, y: 28, lab: 'c' }
-  ]);
-
-var data2 = d3.nest()
-  .key(function(el) {return el.lab;})
-  .entries([
-    {x: 1, y: 15, lab: 'e' },
-    {x: 2, y: 23, lab: 'e' },
-    {x: 3, y: 5, lab: 'e' },
-    {x: 4, y: 1, lab: 'e' },
-    {x: 5, y: 10, lab: 'e' },
-    {x: 1, y: 12, lab: 'f' },
-    {x: 2, y: 13, lab: 'f' },
-    {x: 3, y: 17, lab: 'f' },
-    {x: 4, y: 17, lab: 'f' },
-    {x: 1, y: 13, lab: 'g' },
-    {x: 2, y: 12, lab: 'g' },
-    {x: 3, y: 19, lab: 'g' },
-    {x: 4, y: 21, lab: 'g' }
-  ]);
-
-var data_bar = data.map(function(el) {
-  return { 
-    key: el.key, 
-    values: d3.sum(el.values, 
-      function(d) {
-        return d.y
-      })
-    };
-});
-
-var data_bar2 = data2.map(function(el) {
-  return {
-    key: el.key,
-    values: d3.sum(el.values, function(d) { return d.y; })
-  };
-});
 
 var highlighter = function(selector,keys) {
   "use strict";
@@ -79,10 +24,13 @@ var highlighter = function(selector,keys) {
 var chartFactory = (function() {
   "use strict";
 
+  var last_plot = null;
+
   /**
    * Linegraph mixin
    * @return {object} the chart object with the linegraph properties and
    *    methods added to the objects' prototype.
+   *    TODO: Legend!
    */
   function linegraph() {
 
@@ -103,7 +51,6 @@ var chartFactory = (function() {
     var x_max = get_lim(this.data, d3.max, function(d) { return d.x; });
 
     if (proto._x) {
-      console.log('update _x');
       proto._x.domain([x_min,x_max]);
     }
     else {
@@ -132,16 +79,16 @@ var chartFactory = (function() {
     this.colors().domain(this.data.map(function(el) { return el.key; }));
 
     // Plot data
-    var data_line = proto.all_paths = this._svg.selectAll('path.data')
+    proto.all_paths = this._svg.selectAll('path.data')
       .data(this.data);
     // update selection
-    data_line
+    proto.all_paths
       .attr({
         d: function(d) { return proto.line(d.values); },
         class: function(d) { return 'data ' + d.key; }
       });
     // enter selection
-    data_line
+    proto.all_paths
       .enter()
       .append('path')
       .attr({
@@ -152,8 +99,9 @@ var chartFactory = (function() {
         stroke: function(d) { return that.colors()(d.key); }
       });
     // exit selection
-    data_line.exit().remove();
+    proto.all_paths.exit().remove();
 
+    last_plot = this;
     return this;
   };
 
@@ -197,10 +145,10 @@ var chartFactory = (function() {
 
     that.colors().domain(this.data.map(function(d) { return d.key; }));
 
-    var bar_data = this._svg.selectAll('rect.data')
+    proto.all_bars = this._svg.selectAll('rect.data')
       .data(this.data);
     // update selection
-    bar_data
+    proto.all_bars
       .attr({
         class: function(d) { return 'data ' + d.key; },
         x: function(d) { return that._x(d.key) - _barwidth/2; },
@@ -210,7 +158,7 @@ var chartFactory = (function() {
         fill: function(d) { return that.colors()(d.key); }
     });
     // enter selection
-    bar_data
+    proto.all_bars
       .enter()
       .append('rect')
       .attr({
@@ -222,8 +170,9 @@ var chartFactory = (function() {
         fill: function(d) { return that.colors()(d.key); }
       });
     // exit selection
-    bar_data.exit().remove();
+    proto.all_bars.exit().remove();
 
+    last_plot = this;
     return this;
   }
 
