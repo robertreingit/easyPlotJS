@@ -1,0 +1,48 @@
+.chart {
+  display: inline-block;
+  max-width: 500px;
+}
+
+/* Axis styles */
+.axis line,
+.axis path {
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+}
+
+/* Data styles 
+ * For hover effects two classes are provided:
+ * highlight and shade.
+ * */
+.data {
+  transition: opacity 500ms;
+  transition: stroke-width 500ms;
+}
+path.data {
+  fill: none;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+path.data.shade {
+  opacity: 0.2;
+  stroke-width: 1px;
+  transition: opacity 500ms;
+}
+path.data.highlight {
+  opacity: 1.0;
+  stroke-width: 6px;
+}
+rect.data {
+  stroke: black;
+  stroke-width: 0;
+  stroke-linejoin: round;
+}
+rect.data.shade {
+  opacity: 0.2;
+  transition: opacity 500ms;
+}
+rect.data.highlight {
+  stroke-width: 2px;
+}
+

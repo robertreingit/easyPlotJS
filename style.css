@@ -1,48 +1,53 @@
-.chart {
-  display: inline-block;
-  max-width: 500px;
+body {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background-color: #ddd;
 }
 
-/* Axis styles */
-.axis line,
-.axis path {
-  fill: none;
-  stroke: black;
-  shape-rendering: crispEdges;
+body svg {
+  background-color: white;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 1px 1px 2px; #aaa;
 }
 
-/* Data styles 
- * For hover effects two classes are provided:
- * highlight and shade.
- * */
-.data {
-  transition: opacity 500ms;
-  transition: stroke-width 500ms;
-}
-path.data {
-  fill: none;
-  stroke-width: 3px;
-  stroke-linejoin: round;
-}
-path.data.shade {
-  opacity: 0.2;
-  stroke-width: 1px;
-  transition: opacity 500ms;
-}
-path.data.highlight {
-  opacity: 1.0;
-  stroke-width: 6px;
-}
-rect.data {
-  stroke: black;
-  stroke-width: 0;
-  stroke-linejoin: round;
-}
-rect.data.shade {
-  opacity: 0.2;
-  transition: opacity 500ms;
-}
-rect.data.highlight {
-  stroke-width: 2px;
+body > header {
+  background-color: #f5f5f5;
+  color: #333;
+  padding: 0.25em;
+  font-size: 1.5em;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  text-align: center;
+
 }
 
+nav.top-nav {
+}
+
+.top-nav ul {
+  list-style-type: none;
+}
+
+.top-nav li {
+  display: inline;
+  text-align: center;
+}
+
+.top-nav li a {
+  font-family: Arial;
+  text-decoration: none;
+  padding: 10px;
+  font-size: 10px;
+  background-color: #333;
+  color: #fff;
+  border-bottom: 1px;
+  border-bottom-color: #000;
+  border-bottom-style: solid;
+  border-radius: 5px;
+}
+
+main {
+  padding: 1em;
+}

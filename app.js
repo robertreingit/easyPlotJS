@@ -6,8 +6,12 @@ var eplot = (function() {
 
   var last_plot = null;
 
+  /*
+   * highlighter
+   * Small function to enable mouseover effects on 
+   * connected charts.
+   */
   var highlighter = function(selector,keys) {
-    "use strict";
     var items = d3.selectAll(selector);
     items
         .on('mouseover', function(d) {
@@ -336,13 +340,13 @@ setTimeout(function() {
 
 var lgraph = eplot.chart()
   .width(300)
-  .height(400)
+  .height(300)
   .init('#line')
   .plot(data)
   .xTicks(4);
 
 var bgraph = eplot.chart()
-  .width(350)
+  .width(300)
   .init('#bar')
   .plot(data_bar)
   .yTicks(5);
