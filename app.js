@@ -1,30 +1,31 @@
 
-var highlighter = function(selector,keys) {
-  "use strict";
-  var items = d3.selectAll(selector);
-  items
-      .on('mouseover', function(d) {
-        // hide
-        items
-          .filter(function(d2) { return d2.key !== d.key; })
-          .classed('shade', true);
-        // highlight 
-        items
-          .filter(function(d2) { return d2.key === d.key; })
-          .classed('highlight', true);
-      })
-      .on('mouseout', function(d) {
-        // unclass
-        items
-          .classed({'shade': false, 'highlight': false });
-      });
-};
 
 
-var chartFactory = (function() {
+var eplot = (function() {
   "use strict";
 
   var last_plot = null;
+
+  var highlighter = function(selector,keys) {
+    "use strict";
+    var items = d3.selectAll(selector);
+    items
+        .on('mouseover', function(d) {
+          // hide
+          items
+            .filter(function(d2) { return d2.key !== d.key; })
+            .classed('shade', true);
+          // highlight 
+          items
+            .filter(function(d2) { return d2.key === d.key; })
+            .classed('highlight', true);
+        })
+        .on('mouseout', function(d) {
+          // unclass
+          items
+            .classed({'shade': false, 'highlight': false });
+        });
+  };
 
   /**
    * Linegraph mixin
@@ -179,7 +180,7 @@ var chartFactory = (function() {
   /**
    * Main chart function.
    */
-  return function chart() {
+  function chart() {
     var _width = 300, 
         _height = 200,
         _margin = 30,
@@ -315,9 +316,15 @@ var chartFactory = (function() {
     }
     return Object.create(o);
   }
+
+  return {
+    chart: chart,
+    highlighter: highlighter
+  };
+
 })();
 
-var sgraph = chartFactory()
+var sgraph = eplot.chart()
   .init('#basic')
   .plot(data0);
 
@@ -327,19 +334,19 @@ setTimeout(function() {
   bgraph.plot(data_bar2);
 }, 1000);
 
-var lgraph = chartFactory()
+var lgraph = eplot.chart()
   .width(300)
   .height(400)
   .init('#line')
   .plot(data)
   .xTicks(4);
 
-var bgraph = chartFactory()
+var bgraph = eplot.chart()
   .width(350)
   .init('#bar')
   .plot(data_bar)
   .yTicks(5);
 
-highlighter('.board .data',data.map(function(el) { return el.key; }));
+eplot.highlighter('.board .data',data.map(function(el) { return el.key; }));
 
 
