@@ -1,3 +1,7 @@
+html,
+body {
+  width: 100%;
+}
 body {
   margin: 0;
   border: 0;
@@ -23,31 +27,7 @@ body > header {
 
 }
 
-nav.top-nav {
-}
-
-.top-nav ul {
-  list-style-type: none;
-}
-
-.top-nav li {
-  display: inline;
-  text-align: center;
-}
-
-.top-nav li a {
-  font-family: Arial;
-  text-decoration: none;
-  padding: 10px;
-  font-size: 10px;
-  background-color: #333;
-  color: #fff;
-  border-bottom: 1px;
-  border-bottom-color: #000;
-  border-bottom-style: solid;
-  border-radius: 5px;
-}
-
 main {
   padding: 1em;
 }
+
