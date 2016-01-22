@@ -1,5 +1,4 @@
-
-
+var plot = null;
 
 var eplot = (function() {
   "use strict";
@@ -88,6 +87,8 @@ var eplot = (function() {
       .data(this.data);
     // update selection
     proto.all_paths
+      .transition()
+      .duration(500)
       .attr({
         d: function(d) { return proto.line(d.values); },
         class: function(d) { return 'data ' + d.key; }
@@ -106,7 +107,6 @@ var eplot = (function() {
     // exit selection
     proto.all_paths.exit().remove();
 
-    last_plot = this;
     return this;
   };
 
@@ -154,6 +154,8 @@ var eplot = (function() {
       .data(this.data);
     // update selection
     proto.all_bars
+      .transition()
+      .duration(500)
       .attr({
         class: function(d) { return 'data ' + d.key; },
         x: function(d) { return that._x(d.key) - _barwidth/2; },
@@ -301,6 +303,8 @@ var eplot = (function() {
 
     o.plot = function(data) {
       this.data = data;
+
+      plot = this.plot.bind(this);
       if (data[0].key) { // nested structure
         if (Array.isArray(data[0].values)) {
           return linegraph.call(this);
@@ -338,12 +342,6 @@ var sgraph = eplot.chart()
   .init('#basic')
   .plot(data0);
 
-setTimeout(function() {
-  sgraph.plot(data01);
-  lgraph.plot(data2);
-  bgraph.plot(data_bar2);
-}, 1000);
-
 var lgraph = eplot.chart()
   .width(300)
   .height(300)
@@ -358,5 +356,11 @@ var bgraph = eplot.chart()
   .yTicks(5);
 
 eplot.highlighter('.board .data',data.map(function(el) { return el.key; }));
+
+setTimeout(function() {
+  sgraph.plot(data01);
+  lgraph.plot(data2);
+  bgraph.plot(data_bar2);
+}, 2000);
 
 
