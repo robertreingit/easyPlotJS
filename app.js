@@ -195,8 +195,14 @@ var eplot = (function() {
     var o = {};
 
     o.init = function (sel) {
-      o._svg = d3.select(sel)
-        .append('svg')
+      /* Check if figcaption is available */
+      if (d3.select(sel).select('figcaption').empty()) {
+        o._svg = d3.select(sel).append('svg');
+      }
+      else {
+        o._svg = d3.select(sel).insert('svg','figcaption');
+      }
+      o._svg
         .attr({
           width: _width,
           height: _height
