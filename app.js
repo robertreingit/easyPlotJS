@@ -1,5 +1,7 @@
 var plot = null;
 
+hljs.initHighlightingOnLoad();
+
 var eplot = (function() {
   "use strict";
 
@@ -178,6 +180,75 @@ var eplot = (function() {
       });
     // exit selection
     proto.all_bars.exit().remove();
+
+    last_plot = this;
+    return this;
+  }
+
+  /**
+   *
+   */
+  function scatterplot() {
+    var proto = Object.getPrototypeOf(this),
+        that = this;
+   var get_lim = function(data,lim_fcn,acc_fcn) {
+      return lim_fcn(data.map(function(ds) { return ds.values; }),
+        function(d1) { return lim_fcn(d1, function(d2) {
+          return acc_fcn(d2); }) });
+    };
+
+    var x_min = get_lim(this.data, d3.min, function(d) { return d.x; });
+    var x_max = get_lim(this.data, d3.max, function(d) { return d.x; });
+
+    if (proto._x) {
+      proto._x.domain([x_min,x_max]);
+    }
+    else {
+      proto._x = d3.scale.linear()
+        .domain([x_min,x_max])
+        .range([this.margin(),this.width()-this.margin()])
+    }
+
+    var y_min = get_lim(this.data, d3.min, function(d) { return d.y; });
+    var y_max = get_lim(this.data, d3.max, function(d) { return d.y; });
+
+    if (proto._y) {
+      proto._y.domain([y_min,y_max]);
+    }
+    else {
+      proto._y = d3.scale.linear()
+          .domain([y_min,y_max])
+          .range([this.height()-this.margin(),this.margin()]);
+    }
+
+    this.setup_axes();
+
+   
+    that.colors().domain(this.data.map(function(d) { return d.key; }));
+
+    // Plot data
+    proto.all_circles = this._svg.selectAll('circle.data')
+      .data(this.data);
+    // update selection
+    proto.all_circles
+      .transition()
+      .duration(500)
+      .attr({
+        cx: function(d) { return proto._x(d.x); },
+        cy: function(d) { return proto._y(d.y); },
+        class: function(d) { return 'data ' + d.key; }
+      });
+    // enter selection
+    proto.all_circles
+      .enter()
+      .append('circle')
+      .attr({
+        cx: function(d) { return proto._x(d.x); },
+        cy: function(d) { return proto._y(d.y); },
+        class: function(d) { return 'data ' + d.key; },
+      });
+    // exit selection
+    proto.all_paths.exit().remove();
 
     last_plot = this;
     return this;
