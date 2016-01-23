@@ -422,6 +422,7 @@ var lgraph = eplot.chart()
 
 var bgraph = eplot.chart()
   .width(300)
+  .height(300)
   .init('#bar')
   .plot(data_bar)
   .yTicks(5);

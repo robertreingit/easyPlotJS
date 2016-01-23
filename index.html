@@ -48,13 +48,37 @@ var sgraph = eplot.chart()
         <h2>Connected charts</h2>
       </header>
       <div class="board">
-        <figure class="chart" id="line">
-          <figcaption>A grouped line chart</figcaption>
-        </figure>
-        <figure class="chart" id="bar">
-          <figcaption>A bar chart</figcaption>
-        </figure>
-      </div>
+        <div class="col-50">
+          <pre style="max-width:500px;">
+            <code>
+var lgraph = eplot.chart()
+  .width(300)
+  .height(300)
+  .init('#line')
+  .plot(data)
+  .xTicks(4);
+            </code>
+          </pre>
+          <figure class="chart" id="line">
+            <figcaption>A grouped line chart</figcaption>
+          </figure>
+        </div>
+        <div class="col-50">
+          <pre>
+            <code>
+var bgraph = eplot.chart()
+  .width(300)
+  .height(300)
+  .init('#bar')
+  .plot(data_bar)
+  .yTicks(5);
+            </code>
+          </pre>
+          <figure class="chart" id="bar">
+            <figcaption>A bar chart</figcaption>
+          </figure>
+        </div>
+      </div><!-- .board -->
     </section>
   </main>
 
