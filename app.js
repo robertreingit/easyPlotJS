@@ -189,8 +189,12 @@ var eplot = (function() {
    *
    */
   function scatterplot() {
+    console.log('scatterplot');
     var proto = Object.getPrototypeOf(this),
         that = this;
+
+   var radius = 5;
+    
    var get_lim = function(data,lim_fcn,acc_fcn) {
       return lim_fcn(data.map(function(ds) { return ds.values; }),
         function(d1) { return lim_fcn(d1, function(d2) {
@@ -228,7 +232,7 @@ var eplot = (function() {
 
     // Plot data
     proto.all_circles = this._svg.selectAll('circle.data')
-      .data(this.data);
+      .data(this.data[0].values);
     // update selection
     proto.all_circles
       .transition()
@@ -246,13 +250,14 @@ var eplot = (function() {
         cx: function(d) { return proto._x(d.x); },
         cy: function(d) { return proto._y(d.y); },
         class: function(d) { return 'data ' + d.key; },
+        r: radius
       });
     // exit selection
-    proto.all_paths.exit().remove();
+    proto.all_circles.exit().remove();
 
     last_plot = this;
     return this;
-  }
+  } /* scatterplot */
 
   /**
    * Main chart function.
@@ -372,10 +377,16 @@ var eplot = (function() {
       return this;
     };
 
-    o.plot = function(data) {
+    o.plot = function(data,type) {
       this.data = data;
 
       plot = this.plot.bind(this);
+
+      if (type === 's') {
+        /* scatterplot hack for now */
+        return scatterplot.call(this);
+      }
+
       if (data[0].key) { // nested structure
         if (Array.isArray(data[0].values)) {
           return linegraph.call(this);
@@ -426,6 +437,10 @@ var bgraph = eplot.chart()
   .init('#bar')
   .plot(data_bar)
   .yTicks(5);
+
+var scatter = eplot.chart()
+  .init('#scatter')
+  .plot(datas,'s')
 
 eplot.highlighter('.board .data',data.map(function(el) { return el.key; }));
 
