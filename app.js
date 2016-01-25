@@ -225,35 +225,37 @@ var eplot = (function() {
           .range([this.height()-this.margin(),this.margin()]);
     }
 
-    this.setup_axes();
+    that.setup_axes();
 
-   
-    that.colors().domain(this.data.map(function(d) { return d.key; }));
+    that.colors().domain(that.data.map(function(d) { return d.key; }));
 
     // Plot data
-    proto.all_circles = this._svg.selectAll('circle.data')
-      .data(this.data[0].values);
-    // update selection
-    proto.all_circles
-      .transition()
-      .duration(500)
-      .attr({
-        cx: function(d) { return proto._x(d.x); },
-        cy: function(d) { return proto._y(d.y); },
-        class: function(d) { return 'data ' + d.key; }
-      });
-    // enter selection
-    proto.all_circles
-      .enter()
-      .append('circle')
-      .attr({
-        cx: function(d) { return proto._x(d.x); },
-        cy: function(d) { return proto._y(d.y); },
-        class: function(d) { return 'data ' + d.key; },
-        r: radius
-      });
-    // exit selection
-    proto.all_circles.exit().remove();
+    this.data.forEach(function(ds) {
+      proto.all_circles = that._svg.selectAll('circle.data')
+        .data(ds.values);
+      // update selection
+      proto.all_circles
+        .transition()
+        .duration(500)
+        .attr({
+          cx: function(d) { return proto._x(d.x); },
+          cy: function(d) { return proto._y(d.y); },
+          class: function(d) { return 'data ' + d.key; },
+          fill: function(d) { return that.colors(ds.key); }
+        });
+      // enter selection
+      proto.all_circles
+        .enter()
+        .append('circle')
+        .attr({
+          cx: function(d) { return proto._x(d.x); },
+          cy: function(d) { return proto._y(d.y); },
+          class: function(d) { return 'data ' + ds.key; },
+          r: radius
+        });
+      // exit selection
+      proto.all_circles.exit().remove();
+    })
 
     last_plot = this;
     return this;
@@ -420,9 +422,14 @@ var eplot = (function() {
 
 })();
 
-var sgraph = eplot.chart()
+/*var sgraph = eplot.chart()
   .init('#basic')
-  .plot(data0);
+  .plot(data0);*/
+
+d3.select('code')[0]
+  .forEach(function(snippet) {
+    eval.call(window, snippet.innerText);
+  });
 
 var lgraph = eplot.chart()
   .width(300)
