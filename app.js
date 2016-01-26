@@ -227,7 +227,9 @@ var eplot = (function() {
 
     that.setup_axes();
 
-    that.colors().domain(that.data.map(function(d) { return d.key; }));
+    var color_domain = that.data.map(function(d) { return d.key; });
+    this.colors().domain(color_domain.length == 1 ? 
+      color_domain[0] : color_domain);
 
     // Plot data
     this.data.forEach(function(ds) {
@@ -241,7 +243,7 @@ var eplot = (function() {
           cx: function(d) { return proto._x(d.x); },
           cy: function(d) { return proto._y(d.y); },
           class: function(d) { return 'data ' + d.key; },
-          fill: function(d) { return that.colors(ds.key); }
+          fill: function(d) { return that.colors()(ds.key); }
         });
       // enter selection
       proto.all_circles
@@ -251,7 +253,8 @@ var eplot = (function() {
           cx: function(d) { return proto._x(d.x); },
           cy: function(d) { return proto._y(d.y); },
           class: function(d) { return 'data ' + ds.key; },
-          r: radius
+          r: radius,
+          fill: function(d) { return that.colors()(ds.key); }
         });
       // exit selection
       proto.all_circles.exit().remove();
