@@ -429,11 +429,12 @@ var eplot = (function() {
   .init('#basic')
   .plot(data0);*/
 
-d3.select('code')[0]
+d3.selectAll('code')[0]
   .forEach(function(snippet) {
     eval.call(window, snippet.innerText);
   });
 
+/*
 var lgraph = eplot.chart()
   .width(300)
   .height(300)
@@ -451,7 +452,7 @@ var bgraph = eplot.chart()
 var scatter = eplot.chart()
   .init('#scatter')
   .plot(datas,'s')
-
+*/
 eplot.highlighter('.board .data',data.map(function(el) { return el.key; }));
 
 setTimeout(function() {

@@ -59,7 +59,7 @@ var data_bar2 = data2.map(function(el) {
 });
 
 var datas = [{
-  key: 'dummy',
+  key: 'a',
   values: [
     { x: 0, y: 10 },
     { x: 1, y: 16 },
