@@ -189,11 +189,16 @@ var eplot = (function() {
    *
    */
   function scatterplot() {
-    console.log('scatterplot');
     var proto = Object.getPrototypeOf(this),
         that = this;
 
-   var radius = 5;
+   var _radius = 5;
+   proto.radius = function(val) {
+     if ( val === undefined ) return _radius;
+     _radius = val;
+     return that;
+   }
+
     
    var get_lim = function(data,lim_fcn,acc_fcn) {
       return lim_fcn(data.map(function(ds) { return ds.values; }),
@@ -243,6 +248,7 @@ var eplot = (function() {
           cx: function(d) { return proto._x(d.x); },
           cy: function(d) { return proto._y(d.y); },
           class: function(d) { return 'data ' + d.key; },
+          r: _radius,
           fill: function(d) { return that.colors()(ds.key); }
         });
       // enter selection
@@ -253,7 +259,7 @@ var eplot = (function() {
           cx: function(d) { return proto._x(d.x); },
           cy: function(d) { return proto._y(d.y); },
           class: function(d) { return 'data ' + ds.key; },
-          r: radius,
+          r: _radius,
           fill: function(d) { return that.colors()(ds.key); }
         });
       // exit selection
@@ -425,34 +431,11 @@ var eplot = (function() {
 
 })();
 
-/*var sgraph = eplot.chart()
-  .init('#basic')
-  .plot(data0);*/
-
 d3.selectAll('code')[0]
   .forEach(function(snippet) {
     eval.call(window, snippet.innerText);
   });
 
-/*
-var lgraph = eplot.chart()
-  .width(300)
-  .height(300)
-  .init('#line')
-  .plot(data)
-  .xTicks(4);
-
-var bgraph = eplot.chart()
-  .width(300)
-  .height(300)
-  .init('#bar')
-  .plot(data_bar)
-  .yTicks(5);
-
-var scatter = eplot.chart()
-  .init('#scatter')
-  .plot(datas,'s')
-*/
 eplot.highlighter('.board .data',data.map(function(el) { return el.key; }));
 
 setTimeout(function() {
