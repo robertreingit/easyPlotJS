@@ -122,7 +122,7 @@ var eplot = (function() {
 
     var _barwidth = 20;
     proto.barwidth = function(value) {
-      if (val === undefined) return _barwidth;
+      if (value === undefined) return _barwidth;
       _barwidth = value;
       return that;
     }
@@ -389,9 +389,15 @@ var eplot = (function() {
     };
 
     o.plot = function(data,type) {
-      this.data = data;
 
       plot = this.plot.bind(this);
+      if (data === undefined ) {
+        data = this.data;
+      }
+      else {
+        this.data = data;
+      }
+
 
       if (type === 's') {
         /* scatterplot hack for now */
