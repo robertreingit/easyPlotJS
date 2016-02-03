@@ -390,6 +390,11 @@ var eplot = (function() {
 
     o.plot = function(data,type) {
 
+      // TODO:
+      // Plot function must be changed such that the mixin attaches 
+      // a new plot function to the object which gets called when
+      // properties are being updated.
+
       plot = this.plot.bind(this);
 
       if (data === undefined) { 
@@ -406,7 +411,7 @@ var eplot = (function() {
       }
 
       if (this.data[0].key) { // nested structure
-        if (Array.isArray(data[0].values)) {
+        if (Array.isArray(this.data[0].values)) {
           return linegraph.call(this);
         }
         else {
