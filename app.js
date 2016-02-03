@@ -392,8 +392,9 @@ var eplot = (function() {
 
       plot = this.plot.bind(this);
 
-      if (data === undefined && this.data === undefined ) {
-        throw Error('No data provided');
+      if (data === undefined) { 
+        if (this.data === undefined ) 
+          throw Error('No data provided');
       }
       else {
         this.data = data;
@@ -447,7 +448,7 @@ eplot.highlighter('.board .data',data.map(function(el) { return el.key; }));
 setTimeout(function() {
   sgraph.plot(data01);
   lgraph.plot(data2);
-  bgraph.plot(data_bar2);
+  bgraph.barwidth(30).plot(data_bar2);
 }, 2000);
 
 
