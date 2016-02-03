@@ -121,6 +121,7 @@ var eplot = (function() {
         that = this;
 
     var _barwidth = 20;
+
     proto.barwidth = function(value) {
       if (value === undefined) return _barwidth;
       _barwidth = value;
@@ -154,30 +155,24 @@ var eplot = (function() {
 
     proto.all_bars = this._svg.selectAll('rect.data')
       .data(this.data);
+    var attr_obj = {
+        class: function(d) { return 'data ' + d.key; },
+        x: function(d) { return that._x(d.key) - _barwidth/2; },
+        y: function(d) { return that._y(d.values); },
+        width: _barwidth,
+        height: function(d) { return that._y(0) - that._y(d.values); },
+        fill: function(d) { return that.colors()(d.key); }
+    };
     // update selection
     proto.all_bars
       .transition()
       .duration(500)
-      .attr({
-        class: function(d) { return 'data ' + d.key; },
-        x: function(d) { return that._x(d.key) - _barwidth/2; },
-        y: function(d) { return that._y(d.values); },
-        width: _barwidth,
-        height: function(d) { return that._y(0) - that._y(d.values); },
-        fill: function(d) { return that.colors()(d.key); }
-    });
+      .attr(attr_obj);
     // enter selection
     proto.all_bars
       .enter()
       .append('rect')
-      .attr({
-        class: function(d) { return 'data ' + d.key; },
-        x: function(d) { return that._x(d.key) - _barwidth/2; },
-        y: function(d) { return that._y(d.values); },
-        width: _barwidth,
-        height: function(d) { return that._y(0) - that._y(d.values); },
-        fill: function(d) { return that.colors()(d.key); }
-      });
+      .attr(attr_obj);
     // exit selection
     proto.all_bars.exit().remove();
 
@@ -237,6 +232,13 @@ var eplot = (function() {
       color_domain[0] : color_domain);
 
     // Plot data
+    var attr_obj = {
+          cx: function(d) { return proto._x(d.x); },
+          cy: function(d) { return proto._y(d.y); },
+          r: _radius,
+          fill: function(d) { return that.colors()(ds.key); }
+    };
+
     this.data.forEach(function(ds) {
       proto.all_circles = that._svg.selectAll('circle.data')
         .data(ds.values);
@@ -244,13 +246,8 @@ var eplot = (function() {
       proto.all_circles
         .transition()
         .duration(500)
-        .attr({
-          cx: function(d) { return proto._x(d.x); },
-          cy: function(d) { return proto._y(d.y); },
-          class: function(d) { return 'data ' + d.key; },
-          r: _radius,
-          fill: function(d) { return that.colors()(ds.key); }
-        });
+        .attr(attr_obj)
+        .attr({class: function(d) { return 'data ' + d.key; }});
       // enter selection
       proto.all_circles
         .enter()
@@ -258,9 +255,9 @@ var eplot = (function() {
         .attr({
           cx: function(d) { return proto._x(d.x); },
           cy: function(d) { return proto._y(d.y); },
-          class: function(d) { return 'data ' + ds.key; },
           r: _radius,
-          fill: function(d) { return that.colors()(ds.key); }
+          fill: function(d) { return that.colors()(ds.key); },
+          class: function(d) { return 'data ' + ds.key; }
         });
       // exit selection
       proto.all_circles.exit().remove();
