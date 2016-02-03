@@ -391,20 +391,20 @@ var eplot = (function() {
     o.plot = function(data,type) {
 
       plot = this.plot.bind(this);
-      if (data === undefined ) {
-        data = this.data;
+
+      if (data === undefined && this.data === undefined ) {
+        throw Error('No data provided');
       }
       else {
         this.data = data;
       }
-
 
       if (type === 's') {
         /* scatterplot hack for now */
         return scatterplot.call(this);
       }
 
-      if (data[0].key) { // nested structure
+      if (this.data[0].key) { // nested structure
         if (Array.isArray(data[0].values)) {
           return linegraph.call(this);
         }
@@ -413,10 +413,10 @@ var eplot = (function() {
         }
       }
       else { // flat structure
-        if (data[0].x) {
+        if (this.data[0].x) {
         }
         else { // no accessor function
-          var values = data.map(function(d,i) {
+          var values = this.data.map(function(d,i) {
             return {x:i, y:d} 
           });
           this.data = [{
