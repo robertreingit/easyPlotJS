@@ -115,7 +115,7 @@ var eplot = (function() {
   /**
    * bargraph mixin
    * 
-   */
+   **/
   function bargraph() {
     var proto = Object.getPrototypeOf(this),
         that = this;
@@ -177,8 +177,13 @@ var eplot = (function() {
     proto.all_bars.exit().remove();
 
     last_plot = this;
+
+    this.plot = function() {
+    };
+
     return this;
-  }
+}
+
 
   /**
    *
@@ -270,7 +275,7 @@ var eplot = (function() {
   /**
    * Main chart function.
    */
-  function chart() {
+  function chart(sel) {
     var _width = 300, 
         _height = 200,
         _margin = 30,
@@ -313,12 +318,16 @@ var eplot = (function() {
       if (val === undefined)
         return _height;
       _height = val;
+      this._svg.attr('height',_height);
+      this._svg.select('.x-axis')
+          .attr('transform(' + (this.height() - this.margin()) + ')');
       return this;
     }
 
     o.width = function(val) {
       if (val === undefined) return _width;
       _width = val;
+      this._svg.attr('width',_width);
       return this;
     }
 
@@ -430,6 +439,8 @@ var eplot = (function() {
         }
       }
     }
+
+    o.init(sel);
     return Object.create(o);
   }
 

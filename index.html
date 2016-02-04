@@ -33,8 +33,7 @@
       </header>
       <pre>
         <code class="javascript">
-var sgraph = eplot.chart()
-  .init('#basic')
+var sgraph = eplot.chart('#basic')
   .plot(data0);
         </code>
       </pre>
@@ -51,10 +50,9 @@ var sgraph = eplot.chart()
         <div class="col-50">
           <pre style="max-width:500px;">
             <code>
-var lgraph = eplot.chart()
+var lgraph = eplot.chart('#line')
   .width(300)
   .height(300)
-  .init('#line')
   .plot(data)
   .xTicks(4);
             </code>
@@ -66,10 +64,9 @@ var lgraph = eplot.chart()
         <div class="col-50">
           <pre>
             <code>
-var bgraph = eplot.chart()
+var bgraph = eplot.chart('#bar')
   .width(300)
   .height(300)
-  .init('#bar')
   .plot(data_bar)
   .yTicks(5);
             </code>
@@ -84,8 +81,7 @@ var bgraph = eplot.chart()
       <div class='col-50'>
         <pre>
           <code>
-var scatter = eplot.chart()
-  .init('#scatter')
+var scatter = eplot.chart('#scatter')
   .plot(datas,'s')
           </code>
         </pre>
