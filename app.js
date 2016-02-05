@@ -153,33 +153,37 @@ var eplot = (function() {
 
     that.colors().domain(this.data.map(function(d) { return d.key; }));
 
-    proto.all_bars = this._svg.selectAll('rect.data')
-      .data(this.data);
-    var attr_obj = {
-        class: function(d) { return 'data ' + d.key; },
-        x: function(d) { return that._x(d.key) - _barwidth/2; },
-        y: function(d) { return that._y(d.values); },
-        width: _barwidth,
-        height: function(d) { return that._y(0) - that._y(d.values); },
-        fill: function(d) { return that.colors()(d.key); }
-    };
-    // update selection
-    proto.all_bars
-      .transition()
-      .duration(500)
-      .attr(attr_obj);
-    // enter selection
-    proto.all_bars
-      .enter()
-      .append('rect')
-      .attr(attr_obj);
-    // exit selection
-    proto.all_bars.exit().remove();
+    
 
     last_plot = this;
 
     this.plot = function() {
-    };
+
+      proto.all_bars = this._svg.selectAll('rect.data')
+        .data(this.data);
+      var attr_obj = {
+          class: function(d) { return 'data ' + d.key; },
+          x: function(d) { return that._x(d.key) - _barwidth/2; },
+          y: function(d) { return that._y(d.values); },
+          width: _barwidth,
+          height: function(d) { return that._y(0) - that._y(d.values); },
+          fill: function(d) { return that.colors()(d.key); }
+      };
+      // update selection
+      proto.all_bars
+        .transition()
+        .duration(500)
+        .attr(attr_obj);
+      // enter selection
+      proto.all_bars
+        .enter()
+        .append('rect')
+        .attr(attr_obj);
+      // exit selection
+      proto.all_bars.exit().remove();
+      };
+
+    this.plot();
 
     return this;
 }
@@ -279,7 +283,7 @@ var eplot = (function() {
     var _width = 300, 
         _height = 200,
         _margin = 30,
-        _xAxis = d3.svg.axis().orient('bototm'),
+        _xAxis = d3.svg.axis().orient('bottom'),
         _yAxis = _yAxis = d3.svg.axis().orient('left'),
         _colors = d3.scale.category10();
 
@@ -302,16 +306,22 @@ var eplot = (function() {
       this._svg.append('g')
         .attr({
           class: 'axis x-axis',
-          transform: 'translate(0,' + (this.height() - this.margin()) + ')'
         });
 
       this._svg.append('g')
         .attr({
           class: 'axis y-axis',
-          transform: 'translate(' + _margin + ',0)'
         })
 
+      this.resize();
       return this;
+    }
+
+    o.resize = function() {
+      this._svg.select('.x-axis')
+          .attr('transform','translate(0,' + (this.height() - this.margin()) + ')');
+      this._svg.select('.y-axis')
+        .attr('transform', 'translate(' + this.margin() + ',0)');
     }
 
     o.height = function(val) {
@@ -319,8 +329,7 @@ var eplot = (function() {
         return _height;
       _height = val;
       this._svg.attr('height',_height);
-      this._svg.select('.x-axis')
-          .attr('transform(' + (this.height() - this.margin()) + ')');
+      this.resize();
       return this;
     }
 
@@ -328,6 +337,7 @@ var eplot = (function() {
       if (val === undefined) return _width;
       _width = val;
       this._svg.attr('width',_width);
+      this.resize();
       return this;
     }
 
